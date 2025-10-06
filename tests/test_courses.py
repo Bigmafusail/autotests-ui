@@ -12,7 +12,10 @@ def test_empty_courses_list(courses_list_page: CoursesListPage):
     courses_list_page.navbar.check_visible("username")
     courses_list_page.sidebar.check_visible()
     courses_list_page.toolbar_view.check_visible()
-    courses_list_page.check_visible_empty_view()
+    courses_list_page.empty_view.check_visible(
+        title='There is no results',
+        description='Results from the load test pipeline will be displayed here'
+    )
 
 
 @pytest.mark.courses
