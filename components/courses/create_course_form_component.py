@@ -39,6 +39,3 @@ class CreateCourseFormComponent(BaseComponent):
 
         expect(self.min_score_input).to_be_visible()
         expect(self.min_score_input).to_have_value(min_score)
-
-
-

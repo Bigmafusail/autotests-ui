@@ -17,4 +17,3 @@ class CreateCourseExercisesToolbarViewComponent(BaseComponent):
 
     def click_create_exercise_button(self):
         self.create_exercise_button.click()
-

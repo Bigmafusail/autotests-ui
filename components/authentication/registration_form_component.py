@@ -1,4 +1,4 @@
-from playwright.async_api import Page, expect
+from playwright.sync_api import Page, expect
 
 from components.base_component import BaseComponent
 
@@ -11,9 +11,9 @@ class RegistrationFormComponent(BaseComponent):
         self.username_input = page.get_by_test_id('registration-form-username-input').locator('input')
         self.password_input = page.get_by_test_id('registration-form-password-input').locator('input')
 
-    def fill(self, email: str, password: str, username: str):
+    def fill(self, email: str, username: str, password: str):
         self.email_input.fill(email)
-        self.password_input.fill(password)
+        self.username_input.fill(username)
         self.password_input.fill(password)
 
     def check_visible(self, email: str, password: str, username: str):
