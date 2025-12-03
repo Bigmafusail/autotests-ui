@@ -6,8 +6,8 @@ from config import settings
 from pages.authentication.registration_page import RegistrationPage
 from pages.dashboard.dashboard_page import DashboardPage
 from tools.allure.tags import AllureTag
-from tools.allure.epics import AllureEpic  # Импортируем enum AllureEpic
-from tools.allure.features import AllureFeature  # Импортируем enum AllureFeature
+from tools.allure.epics import AllureEpic # Импортируем enum AllureEpic
+from tools.allure.features import AllureFeature # Импортируем enum AllureFeature
 from tools.allure.stories import AllureStory
 from tools.routes import AppRoute
 
