@@ -10,8 +10,9 @@ on:
     branches:
       - main  # Запускать workflow, когда будет сделан pull request в ветку main
 
-# Определяем все шаги, которые должны быть выполнены в рамках работы с тестами
+# Определяем все джобы, которые должны быть выполнены
 jobs:
+  # Джоба для запуска автотестов
   run-tests:
     runs-on: ubuntu-latest  # Указываем, что тесты будут запускаться на последней версии Ubuntu
 
@@ -46,16 +47,39 @@ jobs:
         run: |
           pytest -m regression --alluredir=allure-results --numprocesses 2  # Запускаем тесты, отмеченные как "regression", генерируем результаты для Allure
 
-      # 5. Шаг для получения истории отчётов Allure, если она существует
+      # 5. Шаг для сохранения результатов тестов как артефакта
+      - name: Upload allure-results artifact
+        uses: actions/upload-artifact@v4  # Используем GitHub Action для загрузки артефакта
+        if: always()  # Сохраняем артефакт всегда, даже если тесты упали
+        with:
+          name: allure-results  # Имя артефакта
+          path: allure-results  # Путь к папке с результатами
+          retention-days: 30  # Сохраняем артефакт на 30 дней
+
+  # Джоба для публикации отчёта на GitHub Pages
+  publish-report:
+    runs-on: ubuntu-latest  # Указываем, что публикация будет выполняться на последней версии Ubuntu
+    needs: run-tests  # Запускаем эту джобу только после успешного завершения run-tests
+    if: always()  # Запускаем даже если run-tests завершился с ошибкой (чтобы можно было опубликовать отчёт)
+
+    steps:
+      # 1. Шаг для загрузки результатов тестов из артефакта
+      - name: Download allure-results artifact
+        uses: actions/download-artifact@v4  # Используем GitHub Action для загрузки артефакта
+        with:
+          name: allure-results  # Имя артефакта для загрузки
+          path: allure-results  # Путь, куда загрузить результаты
+
+      # 2. Шаг для получения истории отчётов Allure, если она существует
       - name: Get Allure history
-        uses: actions/checkout@v4  # Опять клонируем репозиторий, чтобы получить историю отчётов
+        uses: actions/checkout@v4  # Клонируем репозиторий, чтобы получить историю отчётов
         if: always()  # Всегда выполняем, независимо от успеха или неудачи предыдущих шагов
         continue-on-error: true  # Если здесь возникнет ошибка, workflow всё равно продолжит выполнение
         with:
           ref: gh-pages  # Указываем ветку gh-pages для получения отчётов
           path: gh-pages-dir  # Указываем путь для сохранения отчётов
 
-      # 6. Шаг для генерации и отображения отчёта Allure
+      # 3. Шаг для генерации и отображения отчёта Allure
       - name: Generates Allure Report with history
         uses: andgineer/allure-report@v3.6  # Используем проверенное решение из GitHub Marketplace для генерации Allure отчёта
         id: allure-report  # Идентификатор для использования в следующих шагах
@@ -65,7 +89,7 @@ jobs:
           website: gh-pages-dir  # Указываем директорию с сайтом (клонированная ветка gh-pages)
           reports-site-path: builds/tests  # Указываем путь, где будут размещаться отчёты на сайте
 
-      # 7. Шаг для деплоя отчёта Allure на GitHub Pages, чтобы его можно было просматривать в браузере
+      # 4. Шаг для деплоя отчёта Allure на GitHub Pages, чтобы его можно было просматривать в браузере
       - name: Deploy report to Github Pages
         if: always() && steps.allure-report.outcome == 'success'  # Публикуем только если отчёт успешно сгенерирован
         uses: peaceiris/actions-gh-pages@v4  # Используем GitHub Action для публикации отчёта на GitHub Pages
