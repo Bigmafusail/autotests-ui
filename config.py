@@ -13,7 +13,7 @@ class Browser(str, Enum):
 
 
 class TestUser(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="TEST_USER")
+    model_config = SettingsConfigDict()
 
     email: EmailStr
     username: str
@@ -21,7 +21,7 @@ class TestUser(BaseSettings):
 
 
 class TestData(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="TEST_DATA")
+    model_config = SettingsConfigDict()
 
     image_png_file: FilePath
 
@@ -58,17 +58,11 @@ class Settings(BaseSettings):
         allure_results_dir.mkdir(exist_ok=True)  # Создаем папку allure-results, если она не существует
         browser_state_file.touch(exist_ok=True)
 
-        # Инициализируем вложенные классы отдельно, так как они имеют собственные env_prefix
-        test_user = TestUser()
-        test_data = TestData()
-
         return Settings(
             videos_dir=videos_dir,
             tracing_dir=tracing_dir,
             allure_results_dir=allure_results_dir,  # Передаем allure_results_dir в инициализацию настроек
-            browser_state_file=browser_state_file,
-            test_user=test_user,
-            test_data=test_data
+            browser_state_file=browser_state_file
         )
 
 
