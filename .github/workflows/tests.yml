@@ -38,28 +38,39 @@ jobs:
         run: |
           pytest -m regression --alluredir=allure-results --numprocesses 2
 
-      # 5. Шаг для получения истории отчётов Allure, если она существует
+      # 5. Шаг для установки Java (требуется для Allure)
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        if: always()
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      # 6. Шаг для установки Allure CLI и генерации отчета
+      - name: Install Allure and generate report
+        if: always()
+        run: |
+          # Устанавливаем Allure CLI
+          sudo wget https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
+          sudo tar -zxvf allure-2.24.0.tgz -C /opt/
+          sudo ln -s /opt/allure-2.24.0/bin/allure /usr/bin/allure
+          # Генерируем отчет
+          allure generate allure-results -o allure-report --clean
+
+      # 7. Шаг для получения истории отчётов Allure, если она существует
       - name: Get Allure history
         uses: actions/checkout@v4
         if: always()
         continue-on-error: true
         with:
           ref: gh-pages
-          path: gh-pages
+          path: gh-pages-history
 
-      # 6. Шаг для генерации и отображения отчёта Allure (исправленная версия)
-      - name: Generates Allure Report with history
-        uses: jitterbit/allure-report-action@v1.4
-        if: always()
-        with:
-          allure_results: allure-results
-          allure_history: allure-history
-
-      # 7. Шаг для деплоя отчёта Allure на GitHub Pages
+      # 8. Шаг для деплоя отчёта Allure на GitHub Pages
       - name: Deploy report to Github Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-history
+          publish_dir: allure-report
