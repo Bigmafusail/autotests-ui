@@ -16,6 +16,19 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest  # Указываем, что тесты будут запускаться на последней версии Ubuntu
 
+    env:
+      UI_COVERAGE_APPS: |
+        [
+            {
+                "key": "ui-course",
+                "url": "https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/login",
+                "name": "UI Course",
+                "tags": ["UI", "COURSES"],
+                "repository": "https://github.com/Nikita-Filonov/qa-automation-engineer-ui-course"
+            }
+        ]
+      UI_COVERAGE_HTML_REPORT_FILE: "./coverage.html"
+
     steps:
       # 1. Шаг, который будет клонировать ваш репозиторий на машину GitHub Actions
       - name: Check out repository
@@ -44,17 +57,6 @@ jobs:
           TEST_USER.USERNAME: "username"
           TEST_USER.PASSWORD: "password"
           TEST_DATA.IMAGE_PNG_FILE: "./testdata/files/image.png"
-          UI_COVERAGE_APPS: |
-            [
-                {
-                    "key": "ui-course",
-                    "url": "https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/login",
-                    "name": "UI Course",
-                    "tags": ["UI", "COURSES"],
-                    "repository": "https://github.com/Nikita-Filonov/qa-automation-engineer-ui-course"
-                }
-            ]
-          UI_COVERAGE_HTML_REPORT_FILE: "./coverage.html"
         run: |
           pytest -m regression --alluredir=allure-results --numprocesses 2  # Запускаем тесты, отмеченные как "regression", генерируем результаты для Allure
           
